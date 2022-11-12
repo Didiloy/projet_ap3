@@ -29,30 +29,35 @@ module BtSum : Bt_SIG =
       Empty
     ;;
 
-    let bt_add(a,234t : 'a *'a t_234tree) : 'a t_234tree =
-      if 234t == Empty then Rooted('a list = [a];'a t_234tree list = [])
-      else
+    let bt_add(a, tree : 'a *'a t_234tree) : 'a t_234tree =
+      (* if 234t == Empty then Rooted('a list = [a];'a t_234tree list = []) *)
+        if tree == Empty then Rooted([a], [])
+          (* TODO *)
+      else failwith("TODO")
     ;;
 
     let bt_root(bt1 : 'a t_234tree) : 'a list =
       match bt1 with
       |Empty -> failwith("err")
-      |Rooted(a,_,_) -> a
+      (* TODO *)
+      |Rooted(a,_) -> a
     ;;
 
-    let bt_subleft(bt1 : 'a t_btree) : 'a t_btree =
+    let bt_subleft(bt1 : 'a t_234tree) : 'a t_234tree =
       match bt1 with
       |Empty -> failwith("err")
-      |Rooted(_,left,_) -> left
+      (* TODO *)
+      |Rooted(_,left) -> left
     ;;
 
-    let bt_subright(bt1 : 'a t_btree) : 'a t_btree =
+    let bt_subright(bt1 : 'a t_234tree) : 'a t_234tree =
       match bt1 with
       |Empty -> failwith("err")
-      |Rooted(_,_,right) -> right
+      (* TODO *)
+      |Rooted(_,right) -> right
     ;;
 
-    let bt_isempty(bt1 : 'a t_btree) : bool =
+    let bt_isempty(bt1 : 'a t_234tree) : bool =
       match bt1 with
       |Empty -> true
       |_ -> false
