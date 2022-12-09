@@ -10,7 +10,7 @@ module type Bt_SIG =
 
     val bt_empty : unit -> 'a t_234tree
       
-    val bt_add : 'a * 'a t_234tree -> 'a t_234tree
+    (* val bt_add : 'a * 'a t_234tree -> 'a t_234tree   Pas de add vu que c'est la question 6*)
       
     val bt_root : 'a t_234tree -> 'a list
 
@@ -33,11 +33,11 @@ module BtSum : Bt_SIG =
       Empty
     ;;
 
-    let bt_add(a, tree : 'a *'a t_234tree) : 'a t_234tree =
+    (* let bt_add(a, tree : 'a *'a t_234tree) : 'a t_234tree =
         if tree == Empty then Rooted_1(a, Empty, Empty)
           (* TODO *)
       else failwith("TODO")
-    ;;
+    ;; *)
 
     let bt_root(bt1 : 'a t_234tree) : 'a list =
       match bt1 with
