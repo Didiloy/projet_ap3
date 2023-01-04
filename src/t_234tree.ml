@@ -22,7 +22,7 @@ module type Bt_SIG =
 
     val t234_search : 'a  * 'a t_234tree -> bool (*  Question 4 *)
       
-    (* val bt_add : 'a * 'a t_234tree -> 'a t_234tree  Question 6 *)
+    val bt_add : 'a * 'a t_234tree -> 'a t_234tree  (* Question 6 *)
   end
   
 ;;
@@ -99,49 +99,43 @@ module BtSum : Bt_SIG =
            subtree. If the subtree is unchanged after the insertion, it returns the original tree. Otherwise, it
            returns a new tree with the value inserted and the subtree replaced.
       *)
-      (* let bt_add(a, t : 'a * 'a t_234tree) : 'a t_234tree =
+      let rec bt_add(a, t : 'a * 'a t_234tree) : 'a t_234tree =
         let rec add_aux t =
           match t with
           | Empty -> Rooted_1(a, Empty, Empty)
           | Rooted_1(x, l, r) ->
-            if a < x then
-              let l' = add_aux l in
-              if l' == l then t else Rooted_2(x, a, l', r, Empty)
-            else
-              let r' = add_aux r in
-              if r' == r then t else Rooted_2(x, a, l, r', Empty)
+            if a < x then Rooted_1(x,bt_add(a, l), r)
+            else Rooted_1(x,l,bt_add(a,r))
+            
           | Rooted_2(x1, x2, l, m, r) ->
-            if a < x1 then
-              let l' = add_aux l in
-              if l' == l then t else Rooted_3(x1, x2, a, l', m, r, Empty)
-            else if a < x2 then
-              let m' = add_aux m in
-              if m' == m then t else Rooted_3(x1, x2, a, l, m', r, Empty)
-            else
-              let r' = add_aux r in
-              if r' == r then t else Rooted_3(x1, x2, a, l, m, r', Empty)
+            if a < x1 then Rooted_2(x1,x2,bt_add(a, l),m, r)
+              
+            else if a < x2 then Rooted_2(x1,x2,l,bt_add(a, m), r)
+              
+            else Rooted_2(x1,x2,l,m,bt_add(a, r))
+              
           | Rooted_3(x1, x2, x3, l, m, n, r) ->
-            if a < x1 then
-              let l' = add_aux l in
-              if l' == l then t else Rooted_2(x1, x2, l', Rooted_2(x3, a, m, n, r), Empty)
-            else if a < x2 then
-              let m' = add_aux m in
-              if m' == m then t else Rooted_2(x1, x2, Rooted_2(x1, a, l, m', Empty), Rooted_2(x3, x2, n, r, Empty))
-            else if a < x3 then
-              let n' = add_aux n in
-              if n' == n then t else Rooted_2(x1, x2, Rooted_2(x1, x2, l, m, Empty), Rooted_2(x3, a, n', r, Empty))
-            else
-              let r' = add_aux r in
-              if r' == r then t else Rooted_2(x1, x2, Rooted_2(x1, x2, l, m, n), Rooted_2(x3, a, r', Empty, Empty))
-        in add_aux t
-      ;; *)
-
+            if a < x1 then Rooted_3(x1, x2, x3, bt_add(a,l), m, n, r)
+              
+            else if a < x2 then Rooted_3(x1, x2, x3, l, bt_add(a,m), n, r)
+            else if a < x3 then Rooted_3(x1, x2, x3, l, m, bt_add(a,n), r)
+            else Rooted_3(x1, x2, x3, l, m, n, bt_add(a,r))
+            in add_aux t
+      ;;
   end
 ;;
 
-
 (* Question 3 : représentation des arbres de la question 1 *)
 open BtSum;;
+
+
+(* test Question 6 *)
+
+let test : int t_234tree = bt_add(6,bt_add(11,bt_add(20,bt_add(40,rooted_2(5,15,bt_empty(),bt_empty(),bt_empty())))));;
+
+test;;
+
+
 
 let a1 : int t_234tree = rooted_2(
   10, 
