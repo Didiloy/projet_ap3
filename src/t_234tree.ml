@@ -8,6 +8,10 @@ module type Bt_SIG =
   sig
     type 'a t_234tree
 
+    val rooted_1 : 'a * 'a t_234tree * 'a t_234tree -> 'a t_234tree
+    val rooted_2 : 'a * 'a *  'a t_234tree * 'a t_234tree * 'a t_234tree -> 'a t_234tree
+    val rooted_3 : 'a * 'a * 'a * 'a t_234tree * 'a t_234tree * 'a t_234tree * 'a t_234tree -> 'a t_234tree
+
     val bt_empty : unit -> 'a t_234tree
       
     (* val bt_add : 'a * 'a t_234tree -> 'a t_234tree   Pas de add vu que c'est la question 6*)
@@ -18,7 +22,7 @@ module type Bt_SIG =
       
     val bt_isempty : 'a t_234tree -> bool
       
-    val bt_add : 'a * 'a t_234tree -> 'a t_234tree
+    (* val bt_add : 'a * 'a t_234tree -> 'a t_234tree *)
   end
   
 ;;
@@ -29,6 +33,10 @@ module BtSum : Bt_SIG =
                       | Rooted_1 of 'a * 'a t_234tree * 'a t_234tree
                       | Rooted_2 of 'a * 'a *  'a t_234tree * 'a t_234tree * 'a t_234tree
                       | Rooted_3 of 'a * 'a * 'a * 'a t_234tree * 'a t_234tree * 'a t_234tree * 'a t_234tree ;;
+
+    let rooted_1(v, l, r: 'a* 'a t_234tree * 'a t_234tree) = Rooted_1(v, l, r)
+    let rooted_2(v,v2, l, m, r: 'a* 'a * 'a t_234tree * 'a t_234tree * 'a t_234tree) = Rooted_2(v, v2, l, m, r)
+    let rooted_3(v,v2, v3, l, m, n, r: 'a * 'a * 'a * 'a t_234tree * 'a t_234tree * 'a t_234tree * 'a t_234tree) = Rooted_3(v, v2, v3, l, m, n, r)
     
     let bt_empty() : 'a t_234tree =
       Empty
@@ -71,7 +79,7 @@ module BtSum : Bt_SIG =
            subtree. If the subtree is unchanged after the insertion, it returns the original tree. Otherwise, it
            returns a new tree with the value inserted and the subtree replaced.
       *)
-      let bt_add(a, t : 'a * 'a t_234tree) : 'a t_234tree =
+      (* let bt_add(a, t : 'a * 'a t_234tree) : 'a t_234tree =
         let rec add_aux t =
           match t with
           | Empty -> Rooted_1(a, Empty, Empty)
@@ -106,7 +114,33 @@ module BtSum : Bt_SIG =
               let r' = add_aux r in
               if r' == r then t else Rooted_2(x1, x2, Rooted_2(x1, x2, l, m, n), Rooted_2(x3, a, r', Empty, Empty))
         in add_aux t
-      ;;
+      ;; *)
 
   end
 ;;
+
+
+(* Question 3 : représentation des arbres de la question 1 *)
+open BtSum;;
+
+let a1 : int t_234tree = rooted_2(
+  10, 
+  20, 
+  rooted_3(1, 5, 6, bt_empty(), bt_empty(), bt_empty(), bt_empty()), 
+  rooted_3(14, 18, 19, bt_empty(), bt_empty(), bt_empty(), bt_empty()), 
+  rooted_2(23, 35, bt_empty(), bt_empty(), bt_empty())
+);;
+
+let a2 : int t_234tree = rooted_1(
+  15, 
+  rooted_3(1, 5, 6, bt_empty(), bt_empty(), bt_empty(), bt_empty()), 
+  rooted_2(23, 35, bt_empty(), bt_empty(), bt_empty())
+);;
+
+let a3 : int t_234tree = rooted_2(
+  11, 
+  28, 
+  rooted_1(1, bt_empty(), bt_empty()), 
+  rooted_3(14, 18, 27, bt_empty(), bt_empty(), bt_empty(), bt_empty()), 
+  rooted_2(33, 35, bt_empty(), bt_empty(), bt_empty())
+);;
