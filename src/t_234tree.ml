@@ -14,15 +14,15 @@ module type Bt_SIG =
 
     val bt_empty : unit -> 'a t_234tree
       
-    (* val bt_add : 'a * 'a t_234tree -> 'a t_234tree   Pas de add vu que c'est la question 6*)
-      
     val bt_root : 'a t_234tree -> 'a list
 
     val bt_sub : 'a -> 'a t_234tree
       
     val bt_isempty : 'a t_234tree -> bool
+
+    val t234_search : 'a  * 'a t_234tree -> bool (*  Question 4 *)
       
-    (* val bt_add : 'a * 'a t_234tree -> 'a t_234tree *)
+    (* val bt_add : 'a * 'a t_234tree -> 'a t_234tree  Question 6 *)
   end
   
 ;;
@@ -51,14 +51,34 @@ module BtSum : Bt_SIG =
     ;;
 
     let bt_sub(a : 'a) : 'a t_234tree =
-    match a with
-    |_ -> failwith("err")
-  ;;
+      match a with
+      |_ -> failwith("err")
+    ;;
+    
     let bt_isempty(bt1 : 'a t_234tree) : bool =
       match bt1 with
       |Empty -> true
       |_ -> false
     ;;
+
+    let t234_search(e, t: 'a * 'a t_234tree) : bool =
+      let rec search_aux t = 
+        match t with
+        | Empty -> false
+        | Rooted_1(v, l, r) -> if e == v then true else if e < v then search_aux l else search_aux r
+        | Rooted_2(v, v2, l, m, r) ->
+            if e == v || e == v2 then true
+            else if e < v then search_aux l
+            else if e > v2 then search_aux r
+            else search_aux m
+        | Rooted_3(v, v2, v3, l, m, n, r) ->
+          if e == v || e == v2 || e == v3 then true
+          else if e < v then search_aux l
+          else if e > v3 then search_aux r
+          else if e > v && e > v2 then search_aux m
+          else search_aux n
+      in search_aux t
+    ;; 
     
       (* Define an auxiliary function that takes a tree as input and returns a new tree with the value inserted.
          This function uses pattern matching to handle the different cases of the input tree:
@@ -144,3 +164,7 @@ let a3 : int t_234tree = rooted_2(
   rooted_3(14, 18, 27, bt_empty(), bt_empty(), bt_empty(), bt_empty()), 
   rooted_2(33, 35, bt_empty(), bt_empty(), bt_empty())
 );;
+
+t234_search(10, a1);; (*true*)
+t234_search(10, a2);; (*false*)
+t234_search(35, a3);; (*true*)
