@@ -22,7 +22,9 @@ module type Bt_SIG =
 
     val t234_search : 'a  * 'a t_234tree -> bool (*  Question 4 *)
       
-    val bt_add : 'a * 'a t_234tree -> 'a t_234tree  (* Question 6 *)
+    (* Question 6 *)
+    val bt_add : 'a * 'a t_234tree -> 'a t_234tree  
+
   end
   
 ;;
@@ -79,86 +81,117 @@ module BtSum : Bt_SIG =
           else search_aux n
       in search_aux t
     ;; 
-    
-      (* Define an auxiliary function that takes a tree as input and returns a new tree with the value inserted.
-         This function uses pattern matching to handle the different cases of the input tree:
-         - If the input tree is empty, it returns a new tree rooted at a single node containing the value `a`.
-         - If the input tree is a Rooted_1 node, it compares the value `a` with the value in the node. If `a` is
-           smaller, it inserts `a` into the left subtree. If `a` is larger, it inserts `a` into the right subtree.
-           If the subtree is unchanged after the insertion, it returns the original tree. Otherwise, it returns
-           a new tree with the value inserted and the subtree replaced.
-         - If the input tree is a Rooted_2 node, it compares the value `a` with the values in the node. If `a` is
-           smaller than the smallest value, it inserts `a` into the left subtree. If `a` is larger than the largest
-           value, it inserts `a` into the right subtree. If `a` is between the two values, it inserts `a` into the
-           middle subtree. If the subtree is unchanged after the insertion, it returns the original tree. Otherwise,
-           it returns a new tree with the value inserted and the subtree replaced.
-         - If the input tree is a Rooted_3 node, it compares the value `a` with the values in the node. If `a` is
-           smaller than the smallest value, it inserts `a` into the left subtree. If `a` is between the smallest and
-           middle value, it inserts `a` into the middle subtree. If `a` is between the middle and largest value, it
-           inserts `a` into the right subtree. If `a` is larger than the largest value, it inserts `a` into the right
-           subtree. If the subtree is unchanged after the insertion, it returns the original tree. Otherwise, it
-           returns a new tree with the value inserted and the subtree replaced.
-      *)
-      let rec bt_add(a, t : 'a * 'a t_234tree) : 'a t_234tree =
-        let rec add_aux t =
-          match t with
-          | Empty -> Rooted_1(a, Empty, Empty)
-          | Rooted_1(x, l, r) ->
-            if a < x then Rooted_1(x,bt_add(a, l), r)
-            else Rooted_1(x,l,bt_add(a,r))
+
+  
+    let rec bt_add(a, t : 'a * 'a t_234tree) : 'a t_234tree =
+      let rec add_aux t =
+        match t with
+        | Empty -> Rooted_1(a, Empty, Empty)
+        | Rooted_1(x, l, r) ->
+          if a < x then 
+            (match l with
+            | Empty -> Rooted_2(a, x, Empty, Empty, Empty)
+            | Rooted_3(x1, x2, x3, l2, m2, n2, r2) -> 
+                if a < x2 then Rooted_2(x2, x, bt_add(a,Rooted_1(x1,l2,m2)), Rooted_1(x2,n2,r2), r)
+                else Rooted_2(x2, x, Rooted_1(x1,l2,m2), bt_add(a,Rooted_1(x2,n2,r2)), r)
+            | _ -> Rooted_1(x,bt_add(a,l),r))
             
-          | Rooted_2(x1, x2, l, m, r) ->
-            if a < x1 then Rooted_2(x1,x2,bt_add(a, l),m, r)
-              
-            else if a < x2 then Rooted_2(x1,x2,l,bt_add(a, m), r)
-              
-            else Rooted_2(x1,x2,l,m,bt_add(a, r))
-              
-          | Rooted_3(x1, x2, x3, l, m, n, r) ->
-            if a < x1 then Rooted_3(x1, x2, x3, bt_add(a,l), m, n, r)
-              
-            else if a < x2 then Rooted_3(x1, x2, x3, l, bt_add(a,m), n, r)
-            else if a < x3 then Rooted_3(x1, x2, x3, l, m, bt_add(a,n), r)
-            else Rooted_3(x1, x2, x3, l, m, n, bt_add(a,r))
-            in add_aux t
-      ;;
+            
+          else 
+            (match r with
+            | Empty -> Rooted_2(x,a, Empty, Empty, Empty)
+            | Rooted_3(x1, x2, x3, l2, m2, n2, r2) -> 
+              if a < x2 then Rooted_2(x, x2, l, bt_add(a,Rooted_1(x1,l2,m2)), Rooted_1(x3,n2,r2))
+              else Rooted_2(x, x2, l, Rooted_1(x1,l2,m2), bt_add(a,Rooted_1(x3,n2,r2)))
+            
+            | _ -> Rooted_1(x,l,bt_add(a,r)))
+          
+        | Rooted_2(x1, x2, l, m, r) ->
+          if a < x1 then 
+            (match l with
+              | Empty -> Rooted_3(a,x1,x2,Empty,Empty,Empty,Empty)
+              | Rooted_3(x12, x22, x32, l2, m2, n2, r2) ->
+                if a < x22 then Rooted_3(x22,x1,x2,bt_add(a,Rooted_1(x12,l2,m2)), Rooted_1(x32,n2,r2),m,r)
+                else Rooted_3(x22, x1,x2, Rooted_1(x1,l2,m2), bt_add(a,Rooted_1(x32,n2,r2)),m,r)
+              | _ -> Rooted_2(x1, x2, bt_add(a,l), m, r))
+            
+          else if a < x2 then
+            (match m with
+              | Empty -> Rooted_3(x1,a,x2,Empty,Empty,Empty,Empty)
+              | Rooted_3(x12, x22, x32, l2, m2, n2, r2) ->
+                if a < x22 then Rooted_3(x1,x22,x2,l,bt_add(a,Rooted_1(x12,l2,m2)), Rooted_1(x32,n2,r2),r)
+                else Rooted_3(x1,x22,x2,l,Rooted_1(x1,l2,m2), bt_add(a,Rooted_1(x32,n2,r2)),r)
+              | _ -> Rooted_2(x1,x2,l,bt_add(a, m), r))
+            
+          else 
+            (match r with
+              | Empty -> Rooted_3(x1,x2,a,Empty,Empty,Empty,Empty)
+              | Rooted_3(x12, x22, x32, l2, m2, n2, r2) ->
+                if a < x2 then Rooted_3(x1,x2,x22,l,m,bt_add(a,Rooted_1(x12,l2,m2)), Rooted_1(x32,n2,r2))
+                else Rooted_3(x1,x2,x22,l,m,Rooted_1(x1,l2,m2), bt_add(a,Rooted_1(x32,n2,r2)))
+              | _ -> Rooted_2(x1,x2,l,m,bt_add(a, r)))
+            
+        | Rooted_3(x1, x2, x3, l, m, n, r) ->
+          if a < x2 then Rooted_1(x2,bt_add(a,Rooted_1(x1,l,m)),Rooted_1(x3,n,r))
+          else Rooted_1(x2,Rooted_1(x1,l,m),bt_add(a,Rooted_1(x3,n,r)))
+          in add_aux t
+    ;;
+
   end
 ;;
 
-(* Question 3 : représentation des arbres de la question 1 *)
 open BtSum;;
 
-
-(* test Question 6 *)
-
-let test : int t_234tree = bt_add(6,bt_add(11,bt_add(20,bt_add(40,rooted_2(5,15,bt_empty(),bt_empty(),bt_empty())))));;
-
-test;;
-
-
-
+(* Question 3 : représentation des arbres de la question 1 *)
 let a1 : int t_234tree = rooted_2(
   10, 
   20, 
   rooted_3(1, 5, 6, bt_empty(), bt_empty(), bt_empty(), bt_empty()), 
   rooted_3(14, 18, 19, bt_empty(), bt_empty(), bt_empty(), bt_empty()), 
   rooted_2(23, 35, bt_empty(), bt_empty(), bt_empty())
-);;
-
-let a2 : int t_234tree = rooted_1(
-  15, 
+  );;
+  
+  let a2 : int t_234tree = rooted_1(
+    15, 
   rooted_3(1, 5, 6, bt_empty(), bt_empty(), bt_empty(), bt_empty()), 
   rooted_2(23, 35, bt_empty(), bt_empty(), bt_empty())
-);;
+  );;
+  
+  let a3 : int t_234tree = rooted_2(
+    11, 
+    28, 
+    rooted_1(1, bt_empty(), bt_empty()), 
+    rooted_3(14, 18, 27, bt_empty(), bt_empty(), bt_empty(), bt_empty()), 
+    rooted_2(33, 35, bt_empty(), bt_empty(), bt_empty())
+    );;
+    
+    (* Test question 4 *)
+    t234_search(10, a1);; (*true*)
+    t234_search(10, a2);; (*false*)
+    t234_search(35, a3);; (*true*)
+    
+    
+    (* test Question 6 *)
+    let test : int t_234tree ref =  ref(bt_add(6,bt_add(11,bt_add(20,bt_add(42,rooted_2(5,15,bt_empty(),bt_empty(),bt_empty()))))));;
+    t234_search(40, !test);; (*false*)
 
-let a3 : int t_234tree = rooted_2(
-  11, 
-  28, 
-  rooted_1(1, bt_empty(), bt_empty()), 
-  rooted_3(14, 18, 27, bt_empty(), bt_empty(), bt_empty(), bt_empty()), 
-  rooted_2(33, 35, bt_empty(), bt_empty(), bt_empty())
-);;
+    (* Question 7 *)
+    test := bt_add(4, !test);;
+    test := bt_add(35, !test);;
+    test := bt_add(10, !test);;
+    test := bt_add(13, !test);;
+    test := bt_add(3, !test);;
+    test := bt_add(30, !test);;
+    test := bt_add(15, !test);;
+    test := bt_add(12, !test);;
+    test := bt_add(7, !test);;
+    test := bt_add(40, !test);;
+    test := bt_add(20, !test);;
+    test := bt_add(11, !test);;
+    test := bt_add(6, !test);;
 
-t234_search(10, a1);; (*true*)
-t234_search(10, a2);; (*false*)
-t234_search(35, a3);; (*true*)
+    t234_search(40, !test);;
+    t234_search(4, !test);;
+    t234_search(35, !test);;
+    t234_search(10, !test);;
+    t234_search(3, !test);;
