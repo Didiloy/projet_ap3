@@ -15,8 +15,6 @@ module type Bt_SIG =
     val bt_empty : unit -> 'a t_234tree
       
     val bt_root : 'a t_234tree -> 'a list
-
-    val bt_sub : 'a -> 'a t_234tree
       
     val bt_isempty : 'a t_234tree -> bool
 
@@ -50,11 +48,6 @@ module BtSum : Bt_SIG =
       |Rooted_1(a,_, _) -> [a]
       |Rooted_2(a,a2,_,_,_) -> [a; a2]
       |Rooted_3(a,a2,a3,_, _,_,_) -> [a; a2; a3]
-    ;;
-
-    let bt_sub(a : 'a) : 'a t_234tree =
-      match a with
-      |_ -> failwith("err")
     ;;
     
     let bt_isempty(bt1 : 'a t_234tree) : bool =
@@ -195,3 +188,104 @@ let a1 : int t_234tree = rooted_2(
     t234_search(35, !test);;
     t234_search(10, !test);;
     t234_search(3, !test);;
+
+    (* Arbres rouge noir : Question 2 *)
+module type RBT_SIG =
+  sig
+    type color
+    type 'a t_rbtree
+
+    val black : unit -> color 
+     
+    val red : unit -> color
+
+    val node : color * 'a * 'a t_rbtree * 'a t_rbtree -> 'a t_rbtree
+
+    val rbt_empty : unit -> 'a t_rbtree
+      
+    val rbt_root : 'a t_rbtree -> 'a 
+      
+    val rbt_isempty : 'a t_rbtree -> bool
+
+    val rbt_search : 'a  * 'a t_rbtree -> bool (*  Question 4 *)
+      
+    (* Question 6 *)
+    (* val t_rbtree_insert : 'a * 'a t_rbtree -> 'a t_rbtree   *)
+
+  end
+  
+;;
+
+module RBtSum : RBT_SIG =
+  struct
+  type color = Red | Black
+  type 'a t_rbtree = Leaf | Node of color * 'a * 'a t_rbtree * 'a t_rbtree
+
+  let black() = Black
+
+  let red() = Red
+
+  let node(c, v, l, r: color * 'a* 'a t_rbtree * 'a t_rbtree) = Node(c, v, l, r)
+    
+    let rbt_empty() : 'a t_rbtree =
+    Leaf
+    ;;
+
+    let rbt_root(bt1 : 'a t_rbtree) : 'a =
+      match bt1 with
+      |Leaf -> failwith("Empty tree")
+      |Node(c,a, l, r) -> a 
+    ;;
+
+    
+    let rbt_isempty(bt1 : 'a t_rbtree) : bool =
+      match bt1 with
+      |Leaf -> true
+      |_ -> false
+    ;;
+
+    let rbt_search(e, t: 'a * 'a t_rbtree) : bool =
+      let rec search_aux t = 
+        match t with
+        | Leaf -> false
+        | Node(c, v, l, r) -> if e == v then true else if e < v then search_aux l else search_aux r
+      in search_aux t
+    ;; 
+
+  
+    (* let rec rbt_add(a, t : 'a * 'a t_rbtree) : 'a t_rbtree =
+      let rec add_aux t =
+        match t with
+        | Empty -> Node(a, Empty, Empty)
+        | Node(c, v, l, r) ->
+          in add_aux t
+    ;; *)
+
+  end
+;;
+
+open RBtSum;;
+(* Question 2.2 *)
+ let b1 : int t_rbtree = node(black(), 20, 
+                            node(black(), 10, 
+                                node(red(), 5, rbt_empty(), rbt_empty()), 
+                                node(red(), 15, rbt_empty(), rbt_empty())), 
+                            node(red(), 30,
+                                node(black(), 25, rbt_empty(), rbt_empty()),
+                                node(black(), 35, rbt_empty(), rbt_empty())));;
+
+  let b2 : int t_rbtree = node(black(), 10, 
+                                node(black(), 7, 
+                                    node(red(), 2, rbt_empty(), rbt_empty()), 
+                                    rbt_empty()), 
+                                node(black(), 13,
+                                    rbt_empty(),
+                                    node(red(), 15, rbt_empty(), rbt_empty())));;
+
+  let b3 : int t_rbtree = node(black(), 10, 
+                                node(black(), 5, 
+                                    rbt_empty(), 
+                                    rbt_empty()), 
+                                node(red(), 15,
+                                    node(black(), 13, rbt_empty(), rbt_empty()),
+                                    node(black(), 20, rbt_empty(), rbt_empty())));;
