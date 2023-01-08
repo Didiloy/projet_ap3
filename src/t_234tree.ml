@@ -207,10 +207,12 @@ module type RBT_SIG =
       
     val rbt_isempty : 'a t_rbtree -> bool
 
-    val rbt_search : 'a  * 'a t_rbtree -> bool (*  Question 4 *)
+    val rbt_search : 'a  * 'a t_rbtree -> bool 
+
+    val rbt_balance : color * 'a * 'a t_rbtree * 'a t_rbtree -> 'a t_rbtree (*Question 3*)
       
     (* Question 6 *)
-    (* val t_rbtree_insert : 'a * 'a t_rbtree -> 'a t_rbtree   *)
+    val t_rbtree_insert : 'a * 'a t_rbtree -> 'a t_rbtree  
 
   end
   
@@ -252,15 +254,51 @@ module RBtSum : RBT_SIG =
       in search_aux t
     ;; 
 
+
+(* Les 4 cas dans lesquels on doit balance:
+B pour Black et R pour Red
+           Bz            Bz            Bx            Bx
+          / \           / \           / \           / \
+         Ry  d         Rx  d         a   Rz        a   Ry
+       /  \           / \               /  \          /  \
+      Rx   c        a   Ry           Ry   d         b    Rz
+    /  \              /  \          / \                 /  \
+  a    b             b    c       b   c               c    d 
+    *)
+
+    (* Ce que on doit toujours obtenir a la fin:
+               Ry
+              /  \
+            Bx    Bz
+          / \    / \
+        a    b  c   d   
+    *)
+
+    let rbt_balance(c, v, l, r : color * 'a * 'a t_rbtree * 'a t_rbtree ) : 'a t_rbtree =
+      let balance_aux = function
+      | Black, z, Node (Red, y, Node (Red, x, a, b), c), d
+      | Black, z, Node (Red, x, a, Node (Red, y, b, c)), d
+      | Black, x, a, Node (Red, z, Node (Red, y, b, c), d)
+      | Black, x, a, Node (Red, y, b, Node (Red, z, c, d)) ->
+        Node (Red, y, Node (Black, x, a, b), Node (Black, z, c, d))
+      | a, b, c, d -> Node (a, b, c, d)
+      in balance_aux(c, v, l, r)
+    ;;
   
-    (* let rec rbt_add(a, t : 'a * 'a t_rbtree) : 'a t_rbtree =
+
+   
+    let rec t_rbtree_insert(a, t : 'a * 'a t_rbtree) : 'a t_rbtree =
       let rec add_aux t =
         match t with
-        | Empty -> Node(a, Empty, Empty)
-        | Node(c, v, l, r) ->
-          in add_aux t
-    ;; *)
-
+        | Leaf -> Node(Red, a, Leaf, Leaf)
+        | Node(c, v, l, r) as n->
+          if a < v then rbt_balance (c, v, add_aux l, r)
+          else if a > v then rbt_balance (c, v, l, add_aux r)
+          else n
+      in match add_aux t with
+      | Node (_, v,l, r) -> Node (Black, v, l, r)
+      | Leaf -> failwith "impossible d'insérer la valeur"
+    ;;
   end
 ;;
 
@@ -289,3 +327,34 @@ open RBtSum;;
                                 node(red(), 15,
                                     node(black(), 13, rbt_empty(), rbt_empty()),
                                     node(black(), 20, rbt_empty(), rbt_empty())));;
+
+(* test Question 4 *)
+let test2 : int t_rbtree ref =  ref(node(black(), 10, 
+                                        node(black(), 5, 
+                                            rbt_empty(), 
+                                            rbt_empty()), 
+                                        node(red(), 15,
+                                            node(black(), 13, rbt_empty(), rbt_empty()),
+                                            node(black(), 20, rbt_empty(), rbt_empty()))));;
+rbt_search(40, !test2);; (*false*)
+
+    (* Question 5 *)
+    test2 := t_rbtree_insert(4, !test2);;
+    test2 := t_rbtree_insert(35, !test2);;
+    test2 := t_rbtree_insert(10, !test2);;
+    test2 := t_rbtree_insert(13, !test2);;
+    test2 := t_rbtree_insert(3, !test2);;
+    test2 := t_rbtree_insert(30, !test2);;
+    test2 := t_rbtree_insert(15, !test2);;
+    test2 := t_rbtree_insert(12, !test2);;
+    test2 := t_rbtree_insert(7, !test2);;
+    test2 := t_rbtree_insert(40, !test2);;
+    test2 := t_rbtree_insert(20, !test2);;
+    test2 := t_rbtree_insert(11, !test2);;
+    test2 := t_rbtree_insert(6, !test2);;
+
+    rbt_search(40, !test2);;
+    rbt_search(4, !test2);;
+    rbt_search(35, !test2);;
+    rbt_search(10, !test2);;
+    rbt_search(3, !test2);;
